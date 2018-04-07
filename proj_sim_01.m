@@ -1,7 +1,8 @@
 %% ME547 - Project
+clear;
 clear all;
 close all;
-clear;
+clc;
 
 %%-----------------ORIENT ROBOT TO CONVERT INTO 2D PROBLEM------------------%%
 
@@ -46,7 +47,7 @@ clear;
 %%-------------- DRAW THE 'RELEASE LOCATION' WORKSPACE OF THE END EFFECTOR --------------%%
 	
 	% Discretize the 'release-location' workspace with 'n' points
-	n = 5; 
+	n = 1; 
 
 	% Define the range of motion for the 'release-location' workspace
 	q2 = ones(n,1)*60*pi/180; % This sets a fixed value for joint 2 to simplify the math
@@ -82,7 +83,8 @@ clear;
 	
 	% Ball release angle, THETA, is calculated as tangent to the motion of L36
 	% This value is currently assumed and assumes q4_dot is zero at release...which is not the case.
-	theta = pi/2 - atan((z3 - z) ./ (x - x3));
+	%theta = pi/2 - atan((z3 - z) ./ (x - x3));
+	theta = [random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180), random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180), random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180)];
 
 	% These are place holders
 	a = (targetD - x) .* tan(theta);
@@ -95,23 +97,34 @@ clear;
 
 %%------------------------------------ SIMULATE BALL  -------------------------------------%%
 
-	j = 7;
-    xBall = zeros(n,j);
-    zBall = zeros(n,j);
-	xBall(:, 1) = x;
-	zBall(:, 1) = z;
-	K = 1;
-	for J = 1 : n
-		for t = 0.01 : 0.01 : j  
-		    % Ball position
-		    xBall(J, K+1) = xBall(J, 1) + v .* cos(theta(J)) * t;
-		    zBall(J, K+1) = zBall(J, 1) + v .* sin(theta(J)) * t - 0.5 * 9.81 * t^2;
-
-		    K = K + 1;   
-		end
-	end	
-	plot(xBall, zBall, 'g', 'lineWidth', 3);
+	j = 100; % Total duration of ball travel
+	h = 3; % Number of angles for each release-location
 	
+	xBall = zeros(n,j,3);
+	zBall = zeros(n,j,3);
+ 
+	xBall(:, 1, 1) = x;
+	zBall(:, 1, 1) = z;
+    xBall(:, 1, 2) = x;
+	zBall(:, 1, 2) = z;
+    xBall(:, 1, 3) = x;
+	zBall(:, 1, 3) = z;
+	
+	for J = 1 : 1 : n
+		for H = 1 : 1 : h
+			K = 1; % Index for ball position at each time step
+			for t = 0.01 : 0.01 : j  
+			    % Ball position
+			    xBall(J, K+1, H) = xBall(J, 1, H) + v(J, H) .* cos(theta(J, H)) * t;
+			    zBall(J, K+1, H) = zBall(J, 1, H) + v(J, H) .* sin(theta(J, H)) * t - 0.5 * 9.81 * t^2;
+
+			    K = K + 1;   
+            end
+            plot(xBall(J, :, H), zBall(J, :, H), 'g', 'lineWidth', 2);
+	hold on;
+		end
+    end	
+    
 	title("Workspace");
 	xlabel("X Position (mm)");
 	ylabel("Z Position (mm)");
@@ -120,6 +133,7 @@ clear;
 	text(0, 0,'O','Color','red','FontSize',14);
 	text(targetPos(1), targetPos(3),'Target','Color','red','FontSize',14);
 
+%{
 %%------------------------- DEFINE INITIAL JOINT POSITION -------------------------%%
 
 	% Sampling period
@@ -284,5 +298,5 @@ clear;
 	xlabel('Vx (mm/s)');
 	
 	axis 'auto x';
-
+%}
 	
