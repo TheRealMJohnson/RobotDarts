@@ -45,7 +45,7 @@ clear;
 %%-------------- DRAW THE 'RELEASE LOCATION' WORKSPACE OF THE END EFFECTOR --------------%%
 	
 	% Discretize the 'release-location' workspace with 'n' points
-	n = 1; 
+	n = 2; 
 
 	% Define the range of motion for the 'release-location' workspace
 	q2 = ones(n,1)*60*pi/180; % This sets a fixed value for joint 2 to simplify the math
@@ -81,7 +81,7 @@ clear;
 	
 	% Ball release angle, THETA, is calculated as tangent to the motion of L36
 	% This value is currently assumed and assumes q4_dot is zero at release...which is not the case.
-	theta = pi/2 - atan((z3 - z) ./ (x - x3));
+	theta = [random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180), random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180), random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180)];
 
 	% These are place holders
 	a = (targetD - x) .* tan(theta);
