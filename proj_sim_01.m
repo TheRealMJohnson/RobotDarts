@@ -208,7 +208,7 @@ clc;
 		q_dot(k+1,:) = qr_dot;
         q_dotdot(k+1,:)=(q_dot(k+1,:)-q_dot(k,:))/dt;
 	    % Numerical integration 
-	    q(k+1,:) = q(k,:) + dt * qr_dot;
+	    q(k+1,:) = q(k,:) + dt * qr_dot';
 	    
 	    k = k + 1;   
 	end
