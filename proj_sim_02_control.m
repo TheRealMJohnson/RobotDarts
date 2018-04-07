@@ -18,12 +18,7 @@ Q_dot_ref_e=q_dot(:,2);
 Q_ref = q';
 Q_dot_ref = q_dot';
 %%
-
-% Sampling rate
-dt = 0.01;
-
-% Simulation time
-T = 2;
+%sim time and sample rate based on proj_sim_01 values
 
 % GRAVITY ON:1 or OFF:0 (keep it off for HW 2)
 Gravity = 1;
