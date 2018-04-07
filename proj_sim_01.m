@@ -50,9 +50,11 @@ clc;
 	n = 1; 
 
 	% Define the range of motion for the 'release-location' workspace
-	q2 = ones(n,1)*60*pi/180; % This sets a fixed value for joint 2 to simplify the math
-	q3 = (60*pi/180 + 10*pi/180).*rand(n,1) - 60*pi/180 + pi/2;
-	q4 = (60*pi/180 + 10*pi/180).*rand(n,1) - 60*pi/180;
+	q2 = ones(n,1)*40*pi/180; % This sets a fixed value for joint 2 to simplify the math
+	%q3 = (60*pi/180 + 10*pi/180).*rand(n,1) - 60*pi/180 + pi/2;
+	q3 = ones(n,1)*30*pi/180;
+	%q4 = (60*pi/180 + 10*pi/180).*rand(n,1) - 60*pi/180;
+	q4 = ones(n,1)*10*pi/180;
 
 	% Generate the joint coordinates in configuration space at time of release
 	x3 = l(1) .* sin(q2);
@@ -69,6 +71,8 @@ clc;
 	scatter(x4, z4, 'filled');
 	hold on;
 	scatter(x, z, 'filled');
+	hold on;
+	plot([0, 0, x3, x4, x], [-100, 0, z3, z4, z], 'b', 'LineWidth', 3);
 	hold on;
 	plot(x(ws),z(ws),'r', 'LineWidth',1);
 	hold on;
