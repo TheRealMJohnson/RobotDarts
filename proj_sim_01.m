@@ -1,7 +1,7 @@
 %% ME547 - Project
-
+hgiadsfksdjflsdjfls
 clear;
-
+fdsfsdfsdf
 %%-----------------ORIENT ROBOT TO CONVERT INTO 2D PROBLEM------------------%%
 
 	% Location of the target and the robot base
