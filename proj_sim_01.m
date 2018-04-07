@@ -47,11 +47,7 @@ clc;
 %%-------------- DRAW THE 'RELEASE LOCATION' WORKSPACE OF THE END EFFECTOR --------------%%
 	
 	% Discretize the 'release-location' workspace with 'n' points
-<<<<<<< HEAD
-	n = 2; 
-=======
 	n = 1; 
->>>>>>> 7441c0d3a5c0129f958d63864a9cbad0bbc0d025
 
 	% Define the range of motion for the 'release-location' workspace
 	q2 = ones(n,1)*60*pi/180; % This sets a fixed value for joint 2 to simplify the math
@@ -77,65 +73,62 @@ clc;
 	plot(x(ws),z(ws),'r', 'LineWidth',1);
 	hold on;
 
-<<<<<<< HEAD
-% %%---------- CALCULATE PROJECTILE TRAJECTORY AND FIND RELEASE VELOCITY FOR BALL ----------%%
-% 	
-% 	L36 = sqrt((z3 - z).^2 + (x - x3).^2); % Distance from joint 3 to the end effector
-% 	
-% 	% Target position at the point of release
-% 	targetD = sqrt(targetPos(1)^2 + targetPos(2)^2); % Floor distance from the target to joint 3
-% 	targetH = targetPos(3); % Height of target
-% 	
-% 	% Ball release angle, THETA, is calculated as tangent to the motion of L36
-% 	% This value is currently assumed and assumes q4_dot is zero at release...which is not the case.
-% 	theta = [random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180), random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180), random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180)];
-% 
-% 	% These are place holders
-% 	a = (targetD - x) .* tan(theta);
-% 	b = 4.9 * (targetD - x).^2 ./ cos(theta).^2;
-% 	c = targetH - z;
-% 
-% 	% Tangential and angular velocity of end effector
-% 	v = sqrt(b ./ (a - c));
-% 	w = (v ./ L36)*180/pi;
-% 
-% %%------------------------------------ SIMULATE BALL  -------------------------------------%%
-% 
-% 	j = 20;
-%     h = 3; % h should be consistent with the size of theta
-% %     xBall = zeros(n,j);
-% %     zBall = zeros(n,j);
-%     xBall = zeros(n,j, 3);
-%     zBall = zeros(n,j, 3);
-% 	xBall(:, 1, 1) = x;
-% 	zBall(:, 1, 1) = z;
-%     xBall(:, 1, 2) = x;
-% 	zBall(:, 1, 2) = z;
-%     xBall(:, 1, 3) = x;
-% 	zBall(:, 1, 3) = z;
-% 
-% 	for J = 1 : n
-%         for H = 1 : h
-%             K = 1;
-% 		    for t = 0.01 : 0.01 : j  
-% 		        % Ball position
-% 		        xBall(J, K+1, H) = xBall(J, 1, H) + v(J, H) .* cos(theta(J, H)) * t;
-% 		        zBall(J, K+1, H) = zBall(J, 1, H) + v(J, H) .* sin(theta(J, H)) * t - 0.5 * 9.81 * t^2;
-% 
-% 		        K = K + 1;
-%             end
-%             plot(xBall(J, :, H), zBall(J, :, H), 'g', 'lineWidth', 3);
-%             hold on;
-%         end
-% 	end	
-% 	
-% 	title("Workspace");
-% 	xlabel("X Position (mm)");
-% 	ylabel("Z Position (mm)");
-% 	
-% 	% Plot points of interest
-% 	text(0, 0,'O','Color','red','FontSize',14);
-% 	text(targetPos(1), targetPos(3),'Target','Color','red','FontSize',14);
+ %%---------- CALCULATE PROJECTILE TRAJECTORY AND FIND RELEASE VELOCITY FOR BALL ----------%%
+ 	
+ 	L36 = sqrt((z3 - z).^2 + (x - x3).^2); % Distance from joint 3 to the end effector
+ 	
+ 	% Target position at the point of release
+ 	targetD = sqrt(targetPos(1)^2 + targetPos(2)^2); % Floor distance from the target to joint 3
+ 	targetH = targetPos(3); % Height of target
+ 	
+ 	% Ball release angle, THETA, is calculated as tangent to the motion of L36
+ 	% This value is currently assumed and assumes q4_dot is zero at release...which is not the case.
+ 	theta = [random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180), random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180), random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180)];
+ 
+ 	% These are place holders
+ 	a = (targetD - x) .* tan(theta);
+ 	b = 4.9 * (targetD - x).^2 ./ cos(theta).^2;
+ 	c = targetH - z;
+ 
+ 	% Tangential and angular velocity of end effector
+ 	v = sqrt(b ./ (a - c));
+ 	w = (v ./ L36)*180/pi;
+ 
+ %%------------------------------------ SIMULATE BALL  -------------------------------------%%
+ 
+ 	j = 20;
+    h = 3; % h should be consistent with the size of theta
+    xBall = zeros(n,j, 3);
+    zBall = zeros(n,j, 3);
+ 	xBall(:, 1, 1) = x;
+ 	zBall(:, 1, 1) = z;
+    xBall(:, 1, 2) = x;
+ 	zBall(:, 1, 2) = z;
+    xBall(:, 1, 3) = x;
+ 	zBall(:, 1, 3) = z;
+ 
+ 	for J = 1 : n
+         for H = 1 : h
+             K = 1;
+ 		    for t = 0.01 : 0.01 : j  
+ 		        % Ball position
+ 		        xBall(J, K+1, H) = xBall(J, 1, H) + v(J, H) .* cos(theta(J, H)) * t;
+ 		        zBall(J, K+1, H) = zBall(J, 1, H) + v(J, H) .* sin(theta(J, H)) * t - 0.5 * 9.81 * t^2;
+ 
+ 		        K = K + 1;
+             end
+             plot(xBall(J, :, H), zBall(J, :, H), 'g', 'lineWidth', 3);
+             hold on;
+         end
+ 	end	
+ 	
+ 	title("Workspace");
+ 	xlabel("X Position (mm)");
+ 	ylabel("Z Position (mm)");
+ 	
+ 	% Plot points of interest
+ 	text(0, 0,'O','Color','red','FontSize',14);
+ 	text(targetPos(1), targetPos(3),'Target','Color','red','FontSize',14);
 
 %%---------- CALCULATE PROJECTILE TRAJECTORY AND FIND RELEASE VELOCITY FOR BALL ----------%%
 	
