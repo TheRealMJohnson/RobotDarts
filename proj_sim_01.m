@@ -160,7 +160,10 @@ clear;
 	z_3 = -2 * (zRelease - z_path(1)) / T^3 + (zRelease_dot - z_dot) / T^2;
 
 %%-------------------------- SIMULATION - END EFFECTOR --------------------------%%
-
+    x_path = zeros(1,T/dt);
+    z_path = zeros(1,T/dt);
+    Vx = zeros(1,T/dt);
+    Vz = zeros(1,T/dt);
 	k = 1;
 	for t = dt : dt : T
 	        
@@ -187,8 +190,7 @@ clear;
 	    qr_dot = inv(J) * [Vx(k); Vz(k)];
 
 	    % Save the angles of the joints
-		q_dot(k+1,1) = qr_dot(1);
-	    q_dot(k+1,2) = qr_dot(2);
+		q_dot(k+1,:) = qr_dot;
 
 	    % Numerical integration 
 	    q(k+1,1) = q(k,1) + dt * qr_dot(1);
