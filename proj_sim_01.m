@@ -205,10 +205,10 @@ clc;
 
 	    % Save the angles of the joints
 		q_dot(k+1,:) = qr_dot;
-
+        q_dotdot(k+1,:)=(q_dot(k+1,:)-q_dot(k,:))/dt;
 	    % Numerical integration 
-	    q(k+1,1) = q(k,1) + dt * qr_dot(1);
-	    q(k+1,2) = q(k,2) + dt * qr_dot(2);
+	    q(k+1,:) = q(k,:) + dt * qr_dot;
+	    
 	    k = k + 1;   
 	end
 
