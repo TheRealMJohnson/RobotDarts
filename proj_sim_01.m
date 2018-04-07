@@ -137,7 +137,7 @@ clc;
 %%------------------------- DEFINE INITIAL JOINT POSITION -------------------------%%
 
 	% Sampling period
-	dt = 0.01; % Interval duration in seconds
+	dt = 0.001; % Interval duration in seconds
 	T = 0.5; % Simulation duration in seconds
 
 	% Initial joint angles [q3, q4]
