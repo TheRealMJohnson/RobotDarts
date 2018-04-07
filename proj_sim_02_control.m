@@ -30,10 +30,10 @@ angle = zeros(T/dt,2);
 t = zeros(T/dt,1);
 
 % Simulation parameters
-Mass_S = 1; Mass_E = 1; % in kg
-Length_S = 1; Length_E = 1; % in m
+Mass_S = 0.1; Mass_E = 0.1; % in kg
+Length_S = l(2); Length_E = l(3); % in m
 CoM_S = Length_S/2; CoM_E = Length_E/2;   % in m
-MoI_S = 0.01; MoI_E = 0.01*1;  % in kg.m^2, for a point mass
+MoI_S = Mass_S*CoM_S^2; MoI_E = Mass_E*CoM_E^2;  % in kg.m^2, for a point mass
 
 % Euler method
 UpdateAngle = @(q,qdot)([q(1)+dt*qdot(1);
