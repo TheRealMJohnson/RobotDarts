@@ -133,7 +133,7 @@ clc;
 	text(0, 0,'O','Color','red','FontSize',14);
 	text(targetPos(1), targetPos(3),'Target','Color','red','FontSize',14);
 
-%{
+
 %%------------------------- DEFINE INITIAL JOINT POSITION -------------------------%%
 
 	% Sampling period
@@ -298,5 +298,5 @@ clc;
 	xlabel('Vx (mm/s)');
 	
 	axis 'auto x';
-%}
+
 	
