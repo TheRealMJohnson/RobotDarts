@@ -153,7 +153,7 @@ for i=1:T/dt
     yact(i) = l(1) * s1 + l(2) * s12 ;
 end
 figure
-plot(x(2:end),y(2:end),'r--','linewidth',2)
+plot(x_path(2:end),z_path(2:end),'r--','linewidth',2)
 hold on
 plot(xact,yact,'linewidth',2)
 xlabel('x [m]')
@@ -169,6 +169,6 @@ RMSEs=sqrt((Q_ref_s(2:end)*180/pi-angle(:,1))'*(Q_ref_s(2:end)*180/pi-angle(:,1)
 RMSEe=sqrt((Q_ref_e(2:end)*180/pi-angle(:,2))'*(Q_ref_e(2:end)*180/pi-angle(:,2))/200);
 RMSTs=sqrt(T1(:,1)'*T1(:,1)/length(T1));
 RMSTe=sqrt(T1(:,2)'*T1(:,2)/length(T1));
-RMSEee=sqrt(((x(2:end)-xact)*(x(2:end)-xact)'+(y(2:end)-yact)*(y(2:end)-yact)')/length(yact));
+RMSEee=sqrt(((x_path(2:end)-xact)*(x_path(2:end)-xact)'+(z_path(2:end)-yact)*(z_path(2:end)-yact)')/length(yact));
 [RMSEs RMSEe RMSTs RMSTe RMSEee]
 

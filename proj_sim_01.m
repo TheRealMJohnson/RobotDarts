@@ -7,11 +7,11 @@ clc;
 %%-----------------ORIENT ROBOT TO CONVERT INTO 2D PROBLEM------------------%%
 
 	% Location of the target and the robot base
-	targetPos = [740 ; 0 ; 500]; 
-	robotPos = [0 ; 0 ; 50]; 
+	targetPos = [0.740 ; 0 ; 0.500]; 
+	robotPos = [0 ; 0 ; 0.050]; 
 
 	% Define the lengths between each joint [ L23, L34, L46 ]
-	l = [ 260, 290, 78 ];
+	l = [ 0.260, 0.290, 0.078 ];
 
 	% Orient q1 so that the robot faces the target (angle in radians)
 	q1 = atan((targetPos(1) - robotPos(1)) / (targetPos(2) - robotPos(2)));
@@ -39,8 +39,8 @@ clc;
 	% Draw the workspace
 	WS = boundary(X,Z);
 	scatter(X, Z);
-	xlim([-800 800]);
-	ylim([-800 800]);
+	xlim([-0.800 0.800]);
+	ylim([-0.800 0.800]);
 	hold on;
 	plot(X(WS),Z(WS),'b', 'LineWidth',2);
 
