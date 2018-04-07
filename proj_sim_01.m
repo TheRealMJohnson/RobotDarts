@@ -198,7 +198,7 @@ clc;
 	text(targetPos(1), targetPos(3),'Target','Color','red','FontSize',14);
 >>>>>>> 7441c0d3a5c0129f958d63864a9cbad0bbc0d025
 
-%{
+
 %%------------------------- DEFINE INITIAL JOINT POSITION -------------------------%%
 
 	% Sampling period
@@ -446,6 +446,10 @@ clc;
 	xlabel('Vx (mm/s)');
 	
 	axis 'auto x';
+<<<<<<< HEAD
 %}
 >>>>>>> 7441c0d3a5c0129f958d63864a9cbad0bbc0d025
+=======
+
+>>>>>>> 38052acda2adbe496477016617f9c13a2f3a3be7
 	
