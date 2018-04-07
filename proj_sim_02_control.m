@@ -24,7 +24,7 @@ Q_dot_ref = q_dot';
 Gravity = 1;
 
 % Initialization of actual kinematics
-q_act=[90*pi/180, 130*pi/180]';
+q_act= q(1,:)';
 qdot_act = [0,0]';
 angle = zeros(T/dt,2);
 t = zeros(T/dt,1);
