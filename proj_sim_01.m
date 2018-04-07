@@ -1,5 +1,6 @@
 %% ME547 - Project
-
+clear all;
+close all;
 clear;
 
 %%-----------------ORIENT ROBOT TO CONVERT INTO 2D PROBLEM------------------%%
@@ -45,7 +46,7 @@ clear;
 %%-------------- DRAW THE 'RELEASE LOCATION' WORKSPACE OF THE END EFFECTOR --------------%%
 	
 	% Discretize the 'release-location' workspace with 'n' points
-	n = 1; 
+	n = 5; 
 
 	% Define the range of motion for the 'release-location' workspace
 	q2 = ones(n,1)*60*pi/180; % This sets a fixed value for joint 2 to simplify the math
@@ -71,7 +72,7 @@ clear;
 	plot(x(ws),z(ws),'r', 'LineWidth',1);
 	hold on;
 
-%%----------- CALCULATE PROJECTILE TRAJECTORY AND FIND RELEASE VELOCITY FOR BALL  -----------%%
+%%---------- CALCULATE PROJECTILE TRAJECTORY AND FIND RELEASE VELOCITY FOR BALL ----------%%
 	
 	L36 = sqrt((z3 - z).^2 + (x - x3).^2); % Distance from joint 3 to the end effector
 	
@@ -94,14 +95,17 @@ clear;
 
 %%------------------------------------ SIMULATE BALL  -------------------------------------%%
 
+	j = 7;
+    xBall = zeros(n,j);
+    zBall = zeros(n,j);
 	xBall(:, 1) = x;
 	zBall(:, 1) = z;
 	K = 1;
-	for J = 1 : 1 : n
-		for t = 0.01 : 0.01 : 100  
+	for J = 1 : n
+		for t = 0.01 : 0.01 : j  
 		    % Ball position
-		    xBall(J, K+1) = xBall(1) + v .* cos(theta) * t;
-		    zBall(J, K+1) = zBall(1) + v .* sin(theta) * t - 0.5 * 9.81 * t^2;
+		    xBall(J, K+1) = xBall(J, 1) + v .* cos(theta(J)) * t;
+		    zBall(J, K+1) = zBall(J, 1) + v .* sin(theta(J)) * t - 0.5 * 9.81 * t^2;
 
 		    K = K + 1;   
 		end
