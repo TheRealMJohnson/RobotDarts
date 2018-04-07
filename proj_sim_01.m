@@ -1,5 +1,6 @@
 %% ME547 - Project
-
+clear all;
+close all;
 clear;
 
 %%-----------------ORIENT ROBOT TO CONVERT INTO 2D PROBLEM------------------%%
@@ -71,50 +72,64 @@ clear;
 	plot(x(ws),z(ws),'r', 'LineWidth',1);
 	hold on;
 
-%%----------- CALCULATE PROJECTILE TRAJECTORY AND FIND RELEASE VELOCITY FOR BALL  -----------%%
-	
-	L36 = sqrt((z3 - z).^2 + (x - x3).^2); % Distance from joint 3 to the end effector
-	
-	% Target position at the point of release
-	targetD = sqrt(targetPos(1)^2 + targetPos(2)^2); % Floor distance from the target to joint 3
-	targetH = targetPos(3); % Height of target
-	
-	% Ball release angle, THETA, is calculated as tangent to the motion of L36
-	% This value is currently assumed and assumes q4_dot is zero at release...which is not the case.
-	theta = [random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180), random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180), random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180)];
-
-	% These are place holders
-	a = (targetD - x) .* tan(theta);
-	b = 4.9 * (targetD - x).^2 ./ cos(theta).^2;
-	c = targetH - z;
-
-	% Tangential and angular velocity of end effector
-	v = sqrt(b ./ (a - c));
-	w = (v ./ L36)*180/pi;
-
-%%------------------------------------ SIMULATE BALL  -------------------------------------%%
-
-	xBall(:, 1) = x;
-	zBall(:, 1) = z;
-	K = 1;
-	for J = 1 : 1 : n
-		for t = 0.01 : 0.01 : 100  
-		    % Ball position
-		    xBall(J, K+1) = xBall(1) + v .* cos(theta) * t;
-		    zBall(J, K+1) = zBall(1) + v .* sin(theta) * t - 0.5 * 9.81 * t^2;
-
-		    K = K + 1;   
-		end
-	end	
-	plot(xBall, zBall, 'g', 'lineWidth', 3);
-	
-	title("Workspace");
-	xlabel("X Position (mm)");
-	ylabel("Z Position (mm)");
-	
-	% Plot points of interest
-	text(0, 0,'O','Color','red','FontSize',14);
-	text(targetPos(1), targetPos(3),'Target','Color','red','FontSize',14);
+% %%---------- CALCULATE PROJECTILE TRAJECTORY AND FIND RELEASE VELOCITY FOR BALL ----------%%
+% 	
+% 	L36 = sqrt((z3 - z).^2 + (x - x3).^2); % Distance from joint 3 to the end effector
+% 	
+% 	% Target position at the point of release
+% 	targetD = sqrt(targetPos(1)^2 + targetPos(2)^2); % Floor distance from the target to joint 3
+% 	targetH = targetPos(3); % Height of target
+% 	
+% 	% Ball release angle, THETA, is calculated as tangent to the motion of L36
+% 	% This value is currently assumed and assumes q4_dot is zero at release...which is not the case.
+% 	theta = [random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180), random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180), random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180)];
+% 
+% 	% These are place holders
+% 	a = (targetD - x) .* tan(theta);
+% 	b = 4.9 * (targetD - x).^2 ./ cos(theta).^2;
+% 	c = targetH - z;
+% 
+% 	% Tangential and angular velocity of end effector
+% 	v = sqrt(b ./ (a - c));
+% 	w = (v ./ L36)*180/pi;
+% 
+% %%------------------------------------ SIMULATE BALL  -------------------------------------%%
+% 
+% 	j = 20;
+%     h = 3; % h should be consistent with the size of theta
+% %     xBall = zeros(n,j);
+% %     zBall = zeros(n,j);
+%     xBall = zeros(n,j, 3);
+%     zBall = zeros(n,j, 3);
+% 	xBall(:, 1, 1) = x;
+% 	zBall(:, 1, 1) = z;
+%     xBall(:, 1, 2) = x;
+% 	zBall(:, 1, 2) = z;
+%     xBall(:, 1, 3) = x;
+% 	zBall(:, 1, 3) = z;
+% 
+% 	for J = 1 : n
+%         for H = 1 : h
+%             K = 1;
+% 		    for t = 0.01 : 0.01 : j  
+% 		        % Ball position
+% 		        xBall(J, K+1, H) = xBall(J, 1, H) + v(J, H) .* cos(theta(J, H)) * t;
+% 		        zBall(J, K+1, H) = zBall(J, 1, H) + v(J, H) .* sin(theta(J, H)) * t - 0.5 * 9.81 * t^2;
+% 
+% 		        K = K + 1;
+%             end
+%             plot(xBall(J, :, H), zBall(J, :, H), 'g', 'lineWidth', 3);
+%             hold on;
+%         end
+% 	end	
+% 	
+% 	title("Workspace");
+% 	xlabel("X Position (mm)");
+% 	ylabel("Z Position (mm)");
+% 	
+% 	% Plot points of interest
+% 	text(0, 0,'O','Color','red','FontSize',14);
+% 	text(targetPos(1), targetPos(3),'Target','Color','red','FontSize',14);
 
 %%------------------------- DEFINE INITIAL JOINT POSITION -------------------------%%
 
@@ -156,7 +171,10 @@ clear;
 	z_3 = -2 * (zRelease - z_path(1)) / T^3 + (zRelease_dot - z_dot) / T^2;
 
 %%-------------------------- SIMULATION - END EFFECTOR --------------------------%%
-
+    x_path = zeros(1,T/dt);
+    z_path = zeros(1,T/dt);
+    Vx = zeros(1,T/dt);
+    Vz = zeros(1,T/dt);
 	k = 1;
 	for t = dt : dt : T
 	        
@@ -183,8 +201,7 @@ clear;
 	    qr_dot = inv(J) * [Vx(k); Vz(k)];
 
 	    % Save the angles of the joints
-		q_dot(k+1,1) = qr_dot(1);
-	    q_dot(k+1,2) = qr_dot(2);
+		q_dot(k+1,:) = qr_dot;
 
 	    % Numerical integration 
 	    q(k+1,1) = q(k,1) + dt * qr_dot(1);
@@ -198,85 +215,85 @@ clear;
 	Vx(k) = 0;
 	Vz(k) = 0;
 
-%%--------------------------------- PLOT ANGLES ---------------------------------%%
-    % Plotting reference joint angles
-	figure(2);
-	t = [0 : dt : T];
-	subplot(2,2,1); 
-	plot(t, q(:,1)*180/pi, 'b', 'lineWidth', 2);
-	xlim([0.1 1.9]);
-    grid on;
-	ylabel('q_3 (degrees)'); 
-	xlabel('t (sec)');  
-	subplot(2,2,2); 
-	plot(t, q(:,2)*180/pi, 'b', 'lineWidth', 2);
-    xlim([0.1 1.9]);
-	grid on;
-	ylabel('q_4 (degrees)'); 
-	xlabel('t (sec)');  
-
-	% Plotting angular velocities of the joints
-	subplot(2,2,3); 
-	plot(t, q_dot(:,1)*180/pi, 'r', 'lineWidth', 2);
-	xlim([0.1 1.9]);
-    grid on;
-	ylabel('qdot_3 (degrees/s)'); 
-	xlabel('t (sec)');  
-	subplot(2,2,4); 
-	plot(t, q_dot(:,2)*180/pi, 'r', 'lineWidth', 2);
-    xlim([0.1 1.9]);
-	grid on;
-	ylabel('qdot_4 (degrees/s)'); 
-	xlabel('t (sec)');  
-	axis 'auto x';
-
-%%------------------------------ PLOT END EFFECTOR ------------------------------%%
-	figure(3);
-
-	subplot(2,2,1); 
-	plot(t, x_path, 'b', 'lineWidth', 2);
-	grid on;
-    xlim([0.1 1.9]);
-	ylabel('x (mm)'); 
-	xlabel('t (sec)');  
-	subplot(2,2,2); 
-	plot(t, z_path, 'b', 'lineWidth', 2);
-	grid on;
-    xlim([0.1 1.9]);
-	ylabel('z (mm)'); 
-	xlabel('t (sec)');  
-	subplot(2,2,3); 
-	plot(t, Vx, 'r', 'lineWidth', 2);
-	grid on;
-    xlim([0.1 1.9]);
-	ylabel('Vx (mm/s)'); 
-	xlabel('t (sec)');
-	subplot(2,2,4); 
-	plot(t, Vz, 'r', 'lineWidth', 2);
-	grid on;
-    xlim([0.1 1.9]);
-	ylabel('Vz (mm/s)'); 
-	xlabel('t (sec)');
-	axis 'auto x';
-
-%%------------------------------ PLOT KINEMATICS ------------------------------%%
-
-	figure(4);
-
-	subplot(2,2,1); 
-	plot(x_path, z_path, 'b', 'lineWidth', 2);
-	grid on;
-    xlim([-800 800]);
-	ylabel('z (mm)'); 
-	xlabel('x (mm)');  
-	  
-	subplot(2,2,3); 
-	plot(Vx, Vz, 'r', 'lineWidth', 2);
-	grid on;
-    xlim([-100 100]);
-	ylabel('Vz (mm/s)'); 
-	xlabel('Vx (mm/s)');
-	
-	axis 'auto x';
+% %%--------------------------------- PLOT ANGLES ---------------------------------%%
+%     % Plotting reference joint angles
+% 	figure(2);
+% 	t = [0 : dt : T];
+% 	subplot(2,2,1); 
+% 	plot(t, q(:,1)*180/pi, 'b', 'lineWidth', 2);
+% 	xlim([0.1 1.9]);
+%     grid on;
+% 	ylabel('q_3 (degrees)'); 
+% 	xlabel('t (sec)');  
+% 	subplot(2,2,2); 
+% 	plot(t, q(:,2)*180/pi, 'b', 'lineWidth', 2);
+%     xlim([0.1 1.9]);
+% 	grid on;
+% 	ylabel('q_4 (degrees)'); 
+% 	xlabel('t (sec)');  
+% 
+% 	% Plotting angular velocities of the joints
+% 	subplot(2,2,3); 
+% 	plot(t, q_dot(:,1)*180/pi, 'r', 'lineWidth', 2);
+% 	xlim([0.1 1.9]);
+%     grid on;
+% 	ylabel('qdot_3 (degrees/s)'); 
+% 	xlabel('t (sec)');  
+% 	subplot(2,2,4); 
+% 	plot(t, q_dot(:,2)*180/pi, 'r', 'lineWidth', 2);
+%     xlim([0.1 1.9]);
+% 	grid on;
+% 	ylabel('qdot_4 (degrees/s)'); 
+% 	xlabel('t (sec)');  
+% 	axis 'auto x';
+% 
+% %%------------------------------ PLOT END EFFECTOR ------------------------------%%
+% 	figure(3);
+% 
+% 	subplot(2,2,1); 
+% 	plot(t, x_path, 'b', 'lineWidth', 2);
+% 	grid on;
+%     xlim([0.1 1.9]);
+% 	ylabel('x (mm)'); 
+% 	xlabel('t (sec)');  
+% 	subplot(2,2,2); 
+% 	plot(t, z_path, 'b', 'lineWidth', 2);
+% 	grid on;
+%     xlim([0.1 1.9]);
+% 	ylabel('z (mm)'); 
+% 	xlabel('t (sec)');  
+% 	subplot(2,2,3); 
+% 	plot(t, Vx, 'r', 'lineWidth', 2);
+% 	grid on;
+%     xlim([0.1 1.9]);
+% 	ylabel('Vx (mm/s)'); 
+% 	xlabel('t (sec)');
+% 	subplot(2,2,4); 
+% 	plot(t, Vz, 'r', 'lineWidth', 2);
+% 	grid on;
+%     xlim([0.1 1.9]);
+% 	ylabel('Vz (mm/s)'); 
+% 	xlabel('t (sec)');
+% 	axis 'auto x';
+% 
+% %%------------------------------ PLOT KINEMATICS ------------------------------%%
+% 
+% 	figure(4);
+% 
+% 	subplot(2,2,1); 
+% 	plot(x_path, z_path, 'b', 'lineWidth', 2);
+% 	grid on;
+%     xlim([-800 800]);
+% 	ylabel('z (mm)'); 
+% 	xlabel('x (mm)');  
+% 	  
+% 	subplot(2,2,3); 
+% 	plot(Vx, Vz, 'r', 'lineWidth', 2);
+% 	grid on;
+%     xlim([-100 100]);
+% 	ylabel('Vz (mm/s)'); 
+% 	xlabel('Vx (mm/s)');
+% 	
+% 	axis 'auto x';
 
 	
