@@ -7,13 +7,13 @@ clc;
 
 % Location of the target and the robot base
 targetPos = [0.740 ; 0 ; 0.500];
-robotPos = [0 ; 0 ; 0.050];
+robotPos = [0 ; 0 ; 0.00];
 
 dt = 0.001;
 T = 1;
 
 % Define the lengths between each joint [ L23, L34, L46 ]
-l = [ 0.260, 0.290, 0.078 ];
+l = [ 0.260, 0.142, 0.078 ];
 
 % Orient q1 so that the robot faces the target (angle in radians)
 q1 = atan((targetPos(1) - robotPos(1)) / (targetPos(2) - robotPos(2)));
@@ -33,12 +33,12 @@ Q3 = (205*pi/180 + 69*pi/180).*rand(n,1) - 205*pi/180 + pi/2;	% [-69  , 205]
 Q4 = (120*pi/180 + 120*pi/180).*rand(n,1) - 120*pi/180;			% [-120 , 120]
 
 % Generate the coordinate points in configuration space
-X = l(1).*sin(Q2) + l(2).*sin(Q2 + Q3) + l(3).*sin(Q2 + Q3 + Q4);
-Z = l(1).*cos(Q2) + l(2).*cos(Q2 + Q3) + l(3).*cos(Q2 + Q3 + Q4);
+Z = l(1).*sin(Q2) + l(2).*sin(Q2 + Q3) + l(3).*sin(Q2 + Q3 + Q4);
+X = l(1).*cos(Q2) + l(2).*cos(Q2 + Q3) + l(3).*cos(Q2 + Q3 + Q4);
 
 % Draw the workspace
 WS = boundary(X,Z);
-scatter(X, Z);
+%scatter(X, Z);
 xlim([-0.800 0.800]);
 ylim([-0.800 0.800]);
 hold on;
@@ -57,12 +57,12 @@ q3 = ones(n,1)*30*pi/180;
 q4 = ones(n,1)*10*pi/180;
 
 % Generate the joint coordinates in configuration space at time of release
-x3 = l(1) .* sin(q2);
-z3 = l(1) .* cos(q2);
-x4 = l(1).*sin(q2) + l(2).*sin(q2 + q3);
-z4 = l(1).*cos(q2) + l(2).*cos(q2 + q3);
-x = l(1).*sin(q2) + l(2).*sin(q2 + q3) + l(3).*sin(q2 + q3 + q4);
-z = l(1).*cos(q2) + l(2).*cos(q2 + q3) + l(3).*cos(q2 + q3 + q4);
+z3 = l(1) .* sin(q2);
+x3 = l(1) .* cos(q2);
+z4 = l(1).*sin(q2) + l(2).*sin(q2 + q3);
+x4 = l(1).*cos(q2) + l(2).*cos(q2 + q3);
+z = l(1).*sin(q2) + l(2).*sin(q2 + q3) + l(3).*sin(q2 + q3 + q4);
+x = l(1).*cos(q2) + l(2).*cos(q2 + q3) + l(3).*cos(q2 + q3 + q4);
 
 % Draw the workspace
 ws = boundary(x,z);
@@ -70,10 +70,8 @@ scatter(x3, z3, 'filled');
 hold on;
 scatter(x4, z4, 'filled');
 scatter(x, z, 'filled');
-plot([0, 0, x3, x4, x], [-0.1, 0, z3, z4, z], '--r', 'LineWidth', 3);
-hold on;
+%plot([0, 0, x3, x4, x], [-0.1, 0, z3, z4, z], '--r', 'LineWidth', 3);
 plot(x(ws),z(ws),'r', 'LineWidth',1);
-hold on;
 
 %% CALCULATE PROJECTILE TRAJECTORY AND FIND RELEASE VELOCITY FOR BALL
 
@@ -130,28 +128,28 @@ xlabel("X Position (m)");
 ylabel("Z Position (m)");
 
 % Plot joint headings
-text(0, -0.100,'1','Color','blue','FontSize',14);
-text(0, 0,'2','Color','blue','FontSize',14);
-text(x3-0.1, z3+0.1,'3','Color','blue','FontSize',14);
-text(x4-0.1, z4+0.1,'4','Color','blue','FontSize',14);
-text(x+0.1, z-0.1,'E','Color','blue','FontSize',14);
-text(targetPos(1), targetPos(3),'Target','Color','red','FontSize',14);
-hold on;
+% text(0, -0.100,'1','Color','blue','FontSize',14);
+% text(0, 0,'2','Color','blue','FontSize',14);
+% text(x3-0.1, z3+0.1,'3','Color','blue','FontSize',14);
+% text(x4-0.1, z4+0.1,'4','Color','blue','FontSize',14);
+% text(x+0.1, z-0.1,'E','Color','blue','FontSize',14);
+% text(targetPos(1), targetPos(3),'Target','Color','red','FontSize',14);
+% hold on;
 
 %% Redefine Sys for Rigid Last Link
 
 % Initial joint angles [q2, q3]
-q(1,:) = [40*pi/180, 60*pi/180 + pi/2];
+q(1,:) = [120*pi/180, -130*pi/180 ];
 q_3 = 0;
 
-x3_s = l(1) .* sin(q(1,1));
-z3_s = l(1) .* cos(q(1,1));
-x4_s = l(1).*sin(q(1,1)) + l(2).*sin(q(1,1) + q(1,2));
-z4_s = l(1).*cos(q(1,1)) + l(2).*cos(q(1,1) + q(1,2));
-x_s = l(1).*sin(q(1,1)) + l(2).*sin(q(1,1) + q(1,2)) + l(3).*sin(q_3 + q(1,1) + q(1,2));
-z_s = l(1).*cos(q(1,1)) + l(2).*cos(q(1,1) + q(1,2)) + l(3).*cos(q_3 + q(1,1) + q(1,2));
+z2_s = l(1) .* sin(q(1,1));
+x2_s = l(1) .* cos(q(1,1));
+z3_s = l(1).*sin(q(1,1)) + l(2).*sin(q(1,1) + q(1,2));
+x3_s = l(1).*cos(q(1,1)) + l(2).*cos(q(1,1) + q(1,2));
+z_s = l(1).*sin(q(1,1)) + l(2).*sin(q(1,1) + q(1,2)) + l(3).*sin(q_3 + q(1,1) + q(1,2));
+x_s = l(1).*cos(q(1,1)) + l(2).*cos(q(1,1) + q(1,2)) + l(3).*cos(q_3 + q(1,1) + q(1,2));
 
-plot([0, 0, x3_s, x4_s, x_s], [-0.1, 0, z3_s, z4_s, z_s], 'r', 'LineWidth', 3);
+plot([ 0, x2_s, x3_s, x_s], [ 0, z2_s, z3_s, z_s], 'r', 'LineWidth', 3);
 text(x_s, z_s,'Start','Color','red','FontSize',14);
 
 s1 = sin(q(1,1));
@@ -167,7 +165,7 @@ z_path = zeros(1,T/dt);
 Vx = zeros(1,T/dt);
 Vz = zeros(1,T/dt);
 
-x_path(1) = l(1).*s1 + l(2).*s12 + l(3)*s123; % End-effector initial position
+x_path(1) = l(1).*c1 + l(2).*c12 + l(3)*c123; % End-effector initial position
 xRelease = x; % End-effector final position
 x_dot = 0; % End-effector initial speed
 xRelease_dot = v .* cos(theta); % End-effector final speed
@@ -179,7 +177,7 @@ x_3 = (-2.*(xRelease - x_path(1))./T^3) + ((xRelease_dot + x_dot)./T^2);
 
 %% PATH PLANNING - Z
 
-z_path(1) = l(1).*c1 + l(2).*c12 + l(3).*c123; % End-effector initial position
+z_path(1) = l(1).*s1 + l(2).*s12 + l(3).*s123; % End-effector initial position
 zRelease = z; % End-effector final position
 z_dot = 0; % End-effector initial speed
 zRelease_dot = v .* sin(theta); % End-effector final speed
@@ -225,12 +223,11 @@ for t = dt : dt : T
     
     k=k+1;
 end
-text(x_path(1), z_path(1),'Path','Color','Green','FontSize',14);
-hold on;
 plot(x_path, z_path, '--k', 'lineWidth', 2);
+hold on;
 
 %% PLOT END EFFECTOR 
-figure(3);
+figure(2);
 
 subplot(2,2,1);
 plot(t, x_path, 'b', 'lineWidth', 2);
@@ -307,3 +304,15 @@ grid on;
 ylabel('Vz (mm/s)');
 xlabel('t (sec)');
 axis 'auto x';
+
+%% Plot trajectories from angles
+figure(1);
+x_regen = zeros(1,T/dt+1);
+z_regen = zeros(1,T/dt+1);
+for i=1:T/dt+1
+    z_regen(i) = l(1).*sin(q(i,1)) + l(2).*sin(q(i,1) + q(i,2)) + l(3).*sin(q(i,1) + q(i,2));
+    x_regen(i) = l(1).*cos(q(i,1)) + l(2).*cos(q(i,1) + q(i,2)) + l(3).*cos(q(i,1) + q(i,2));
+end
+plot(x_regen,z_regen, '--m', 'lineWidth', 2);
+ylabel('Y (m)');
+xlabel('X (m)');

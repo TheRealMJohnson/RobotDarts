@@ -6,8 +6,8 @@ set(0,'DefaultFigureWindowStyle','docked'); tic
 % repurposed by Matthew Johnson 07/04/2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % control gains
-Kp=50;
-Kd=14.14;
+Kp=1;
+Kd=1;
 
 %% Renaming variables
 Q_ref_s=q(:,1);
