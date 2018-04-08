@@ -30,8 +30,8 @@ angle = zeros(T/dt,2);
 t = zeros(T/dt,1);
 
 % Simulation parameters
-Mass_S = 0.1; Mass_E = 0.1; % in kg
-Length_S = l(2); Length_E = l(3); % in m
+Mass_S = 1; Mass_E = 1; % in kg
+Length_S = l(1); Length_E = l(2); % in m
 CoM_S = Length_S/2; CoM_E = Length_E/2;   % in m
 MoI_S = Mass_S*CoM_S^2; MoI_E = Mass_E*CoM_E^2;  % in kg.m^2, for a point mass
 
@@ -75,10 +75,8 @@ end
 for i=1:T/dt
     t(i) = i*dt;
     %% measurement of joint angles and angular velocity part b and c
-    
     q_m=q_act +randn(2,1)*0.0044; %
     qdot_m=qdot_act+randn(2,1)*0.044;
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% complete the PD controller equation
     % such that Torque be a vector of 2x1 (row 1: shoulder row 2: elbow)
     % only one controller torque should be uncommented at each simulation
@@ -92,7 +90,7 @@ for i=1:T/dt
     G_est =  EstimateGravityMatrix(q(i,:)');
     Torque3 = Torque_PD + (Torque_FF(:,i)+G_est+Cqdot_est);
     
-    Torque = Torque3;
+    Torque = Torque1;
     %%%%%%%%%
     %%
     
@@ -132,7 +130,7 @@ plot(t(:,1),Q_ref_s(1:T/dt)'*180/pi,'r--','linewidth',1)
 plot(t(:,1),Q_ref_e(1:T/dt)'*180/pi,'g--','linewidth',1)
 xlabel('time [s]')
 ylabel('angle [degree]')
-legend('shoulder','elbow')
+legend('shoulder','elbow', 'location', 'best')
 set(gca,'fontsize',24)
 figure
 plot(t(:,1),T1(:,1),'r','linewidth',2)
@@ -140,7 +138,7 @@ hold on
 plot(t(:,1),T1(:,2),'g','linewidth',2)
 xlabel('time [s]')
 ylabel('Torque [N.m]')
-legend('shoulder','elbow')
+legend('shoulder','elbow', 'location', 'best')
 set(gca,'fontsize',24)
 %%  end effector position
 % forward kinematics
