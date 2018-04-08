@@ -72,7 +72,7 @@ clc;
 	hold on;
 	scatter(x, z, 'filled');
 	hold on;
-	plot([0, 0, x3, x4, x], [-100, 0, z3, z4, z], 'b', 'LineWidth', 3);
+	plot([0, 0, x3, x4, x], [-0.1, 0, z3, z4, z], 'b', 'LineWidth', 3);
 	hold on;
 	plot(x(ws),z(ws),'r', 'LineWidth',1);
 	hold on;
@@ -92,7 +92,7 @@ clc;
         random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180)];
     
     theta = THETA(1);
-    
+ 
  	% These are place holders
  	a = (targetD - x) .* tan(theta);
  	b = 4.9 * (targetD - x).^2 ./ cos(theta).^2;
@@ -100,7 +100,6 @@ clc;
  
  	% Tangential and angular velocity of end effector
  	v = sqrt(b ./ (a - c));
- 	w = (v ./ L36)*180/pi;
  
 %%------------------------------------ SIMULATE BALL  -------------------------------------%%
  
@@ -134,9 +133,14 @@ clc;
  	xlabel("X Position (mm)");
  	ylabel("Z Position (mm)");
  	
- 	% Plot points of interest
- 	text(0, 0,'O','Color','red','FontSize',14);
+ 	% Plot joint headings
+ 	text(0, -0.100,'1','Color','blue','FontSize',14);
+ 	text(0, 0,'2','Color','blue','FontSize',14);
+ 	text(x3-10, z3+10,'3','Color','blue','FontSize',14);
+ 	text(x4, z4,'4','Color','blue','FontSize',14);
+ 	text(x, z,'E','Color','blue','FontSize',14);
  	text(targetPos(1), targetPos(3),'Target','Color','red','FontSize',14);
+ 	hold on;
 
 %%------------------------- DEFINE INITIAL JOINT POSITION -------------------------%%
 
@@ -145,8 +149,18 @@ clc;
 	T = 0.5; % Simulation duration in seconds
 
 	% Initial joint angles [q3, q4]
-	q(1,:) = [ 60*pi/180 + pi/2, -110*pi/180];
-	q_2 = 60*pi/180;
+	q(1,:) = [ 60*pi/180 + pi/2, 60*pi/180];
+	q_2 = 40*pi/180;
+
+	x3_s = l(1) .* sin(q_2);
+	z3_s = l(1) .* cos(q_2);
+	x4_s = l(1).*sin(q_2) + l(2).*sin(q_2 + q(1,1));
+	z4_s = l(1).*cos(q_2) + l(2).*cos(q_2 + q(1,1));
+	x_s = l(1).*sin(q_2) + l(2).*sin(q_2 + q(1,1)) + l(3).*sin(q_2 + q(1,1) + q(1,2));
+	z_s = l(1).*cos(q_2) + l(2).*cos(q_2 + q(1,1)) + l(3).*cos(q_2 + q(1,1) + q(1,2));
+	
+	plot([0, 0, x3_s, x4_s, x_s], [-0.1, 0, z3_s, z4_s, z_s], 'r', 'LineWidth', 3);
+	text(x_s, z_s,'Start','Color','red','FontSize',14);
 
 	s1 = sin(q_2 + q(1,1));
 	s12 = sin(q_2 + q(1,1) + q(1,2));
@@ -154,17 +168,18 @@ clc;
 	c12 = cos(q_2 + q(1,1) + q(1,2));
 
 %%------------------------------- PATH PLANNING - X -------------------------------%%
-
+    x_path = zeros(1,T/dt);
+    z_path = zeros(1,T/dt);
+	
 	x_path(1) = l(1).*sin(q_2) + l(2).*s1 + l(3).*s12; % End-effector initial position	
-
-    xRelease = x; % End-effector final position
+	xRelease = x; % End-effector final position
 	x_dot = 0; % End-effector initial speed
 	xRelease_dot = v(1) .* cos(q3); % End-effector final speed
 	
 	x_0 = x(1);
 	x_1 = x_dot;
-	x_2 = 3 * (xRelease - x_path(1)) / T^2 - 2 * (xRelease_dot - x_dot) / T;
-	x_3 = -2 * (xRelease - x_path(1)) / T^3 + (xRelease_dot - x_dot) / T^2;
+	x_2 = 3 .* (xRelease - x_path(1)) ./ T^2 - 2 .* (xRelease_dot - x_dot) ./ T;
+	x_3 = -2 .* (xRelease - x_path(1)) ./ T^3 + (xRelease_dot - x_dot) ./ T^2;
 
 %%------------------------------ PATH PLANNING - Z ------------------------------%%
 
@@ -179,8 +194,7 @@ clc;
 	z_3 = -2 * (zRelease - z_path(1)) / T^3 + (zRelease_dot - z_dot) / T^2;
 
 %%-------------------------- SIMULATION - END EFFECTOR --------------------------%%
-    x_path = zeros(1,T/dt);
-    z_path = zeros(1,T/dt);
+
     Vx = zeros(1,T/dt);
     Vz = zeros(1,T/dt);
 	k = 1;
@@ -216,6 +230,8 @@ clc;
 	    
 	    k = k + 1;   
 	end
+	plot(x_path, z_path, 'b', 'lineWidth', 2);
+
 
 	% Velocity on the last position V(t=T)=0 
 	% It's a point-to-point task; therefore, the end-effector stops (Vx=Vz=0)
@@ -372,14 +388,12 @@ clc;
 	subplot(2,2,1); 
 	plot(x_path, z_path, 'b', 'lineWidth', 2);
 	grid on;
-    xlim([-800 800]);
 	ylabel('z (mm)'); 
 	xlabel('x (mm)');  
 	  
 	subplot(2,2,3); 
 	plot(Vx, Vz, 'r', 'lineWidth', 2);
 	grid on;
-    xlim([-100 100]);
 	ylabel('Vz (mm/s)'); 
 	xlabel('Vx (mm/s)');
 	
