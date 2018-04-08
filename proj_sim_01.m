@@ -70,7 +70,7 @@ scatter(x3, z3, 'filled');
 hold on;
 scatter(x4, z4, 'filled');
 scatter(x, z, 'filled');
-plot([0, 0, x3, x4, x], [-0.1, 0, z3, z4, z], 'b', 'LineWidth', 3);
+plot([0, 0, x3, x4, x], [-0.1, 0, z3, z4, z], '--r', 'LineWidth', 3);
 hold on;
 plot(x(ws),z(ws),'r', 'LineWidth',1);
 hold on;
@@ -82,8 +82,8 @@ targetD = sqrt(targetPos(1)^2 + targetPos(2)^2); % Floor distance from the targe
 targetH = targetPos(3); % Height of target
 
 % This value is currently assumed and assumes q4_dot is zero at release...which is not the case.
-THETA = [ %0.7854,
-    random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180),
+THETA = [ 1,
+    %random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180),
     random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180),
     random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180)];
 
@@ -138,28 +138,28 @@ text(x+0.1, z-0.1,'E','Color','blue','FontSize',14);
 text(targetPos(1), targetPos(3),'Target','Color','red','FontSize',14);
 hold on;
 
-%% DEFINE INITIAL JOINT POSITION
+%% Redefine Sys for Rigid Last Link
 
+% Initial joint angles [q2, q3]
+q(1,:) = [40*pi/180, 60*pi/180 + pi/2];
+q_3 = 0;
 
-
-% Initial joint angles [q3, q4]
-q(1,:) = [ 60*pi/180 + pi/2, -10*pi/180];
-q_2 = 40*pi/180;
-
-x3_s = l(1) .* sin(q_2);
-z3_s = l(1) .* cos(q_2);
-x4_s = l(1).*sin(q_2) + l(2).*sin(q_2 + q(1,1));
-z4_s = l(1).*cos(q_2) + l(2).*cos(q_2 + q(1,1));
-x_s = l(1).*sin(q_2) + l(2).*sin(q_2 + q(1,1)) + l(3).*sin(q_2 + q(1,1) + q(1,2));
-z_s = l(1).*cos(q_2) + l(2).*cos(q_2 + q(1,1)) + l(3).*cos(q_2 + q(1,1) + q(1,2));
+x3_s = l(1) .* sin(q(1,1));
+z3_s = l(1) .* cos(q(1,1));
+x4_s = l(1).*sin(q(1,1)) + l(2).*sin(q(1,1) + q(1,2));
+z4_s = l(1).*cos(q(1,1)) + l(2).*cos(q(1,1) + q(1,2));
+x_s = l(1).*sin(q(1,1)) + l(2).*sin(q(1,1) + q(1,2)) + l(3).*sin(q_3 + q(1,1) + q(1,2));
+z_s = l(1).*cos(q(1,1)) + l(2).*cos(q(1,1) + q(1,2)) + l(3).*cos(q_3 + q(1,1) + q(1,2));
 
 plot([0, 0, x3_s, x4_s, x_s], [-0.1, 0, z3_s, z4_s, z_s], 'r', 'LineWidth', 3);
 text(x_s, z_s,'Start','Color','red','FontSize',14);
 
-s1 = sin(q_2 + q(1,1));
-s12 = sin(q_2 + q(1,1) + q(1,2));
-c1 = cos(q_2 + q(1,1));
-c12 = cos(q_2 + q(1,1) + q(1,2));
+s1 = sin(q(1,1));
+s12 = sin(q(1,1) + q(1,2));
+s123 = sin(q(1,1) + q(1,2) + q_3);
+c1 = cos(q(1,1));
+c12 = cos(q(1,1) + q(1,2));
+c123 = cos(q(1,1) + q(1,2) + q_3);
 
 %% PATH PLANNING - X
 x_path = zeros(1,T/dt);
@@ -167,7 +167,7 @@ z_path = zeros(1,T/dt);
 Vx = zeros(1,T/dt);
 Vz = zeros(1,T/dt);
 
-x_path(1) = l(1).*sin(q_2) + l(2).*s1 + l(3).*s12; % End-effector initial position
+x_path(1) = l(1).*s1 + l(2).*s12 + l(3)*s123; % End-effector initial position
 xRelease = x; % End-effector final position
 x_dot = 0; % End-effector initial speed
 xRelease_dot = v .* cos(theta); % End-effector final speed
@@ -179,7 +179,7 @@ x_3 = (-2.*(xRelease - x_path(1))./T^3) + ((xRelease_dot + x_dot)./T^2);
 
 %% PATH PLANNING - Z
 
-z_path(1) = l(1).*cos(q_2) + l(2).*c1 + l(3).*c12; % End-effector initial position
+z_path(1) = l(1).*c1 + l(2).*c12 + l(3).*c123; % End-effector initial position
 zRelease = z; % End-effector final position
 z_dot = 0; % End-effector initial speed
 zRelease_dot = v .* sin(theta); % End-effector final speed
@@ -201,16 +201,18 @@ for t = dt : dt : T
     Vx(k+1) = x_1 + 2*x_2*t + 3*x_3*t^2;
     Vz(k+1) = z_1 + 2*z_2*t + 3*z_3*t^2;
     
-    s1 = sin(q_2 + q(k,1));
-    s12 = sin(q_2 + q(k,1) + q(k,2));
-    c1 = cos(q_2 + q(k,1));
-    c12 = cos(q_2 + q(k,1) + q(k,2));
+    s1 = sin(q(1,1));
+    s12 = sin(q(1,1) + q(1,2));
+    s123 = sin(q(1,1) + q(1,2) + q_3);
+    c1 = cos(q(1,1));
+    c12 = cos(q(1,1) + q(1,2));
+    c123 = cos(q(1,1) + q(1,2) + q_3);
     
     % Compute Jacobian (J)
-    J(1,1) = - l(2) * s1 - l(3)*s12;
-    J(1,2) = - l(3) * s12;
-    J(2,1) =   l(2) * c1 + l(3)*c12;
-    J(2,2) =   l(3) * c12;
+    J(1,1) = - l(1) * s1 - (l(2)+l(3))*s12;
+    J(1,2) = - (l(2)+l(3)) * s12;
+    J(2,1) =   l(1) * c1 + (l(2)+l(3))*c12;
+    J(2,2) =   (l(2)+l(3)) * c12;
     
     % Calculating joint angular velocities from end effector velocity ([Vx(k);Vz(k)])
     qr_dot = inv(J) * [Vx(k); Vz(k)];
@@ -227,69 +229,27 @@ text(x_path(1), z_path(1),'Path','Color','Green','FontSize',14);
 hold on;
 plot(x_path, z_path, '--k', 'lineWidth', 2);
 
-
-% Velocity on the last position V(t=T)=0
-% It's a point-to-point task; therefore, the end-effector stops (Vx=Vz=0)
-% This is written so to have the same vector length with t for the plot
-%	Vx(k) = 0;
-%	Vz(k) = 0;
-
-%% PLOT ANGLES
-% Plotting reference joint angles
-figure(2);
-subplot(2,2,1);
-plot(t, q(:,1)*180/pi, 'b', 'lineWidth', 2);
-xlim([0.1 1.9]);
-grid on;
-ylabel('q_3 (degrees)');
-xlabel('t (sec)');
-subplot(2,2,2);
-plot(t, q(:,2)*180/pi, 'b', 'lineWidth', 2);
-xlim([0.1 1.9]);
-grid on;
-ylabel('q_4 (degrees)');
-xlabel('t (sec)');
-
-% Plotting angular velocities of the joints
-subplot(2,2,3);
-plot(t, q_dot(:,1)*180/pi, 'r', 'lineWidth', 2);
-xlim([0.1 1.9]);
-grid on;
-ylabel('qdot_3 (degrees/s)');
-xlabel('t (sec)');
-subplot(2,2,4);
-plot(t, q_dot(:,2)*180/pi, 'r', 'lineWidth', 2);
-xlim([0.1 1.9]);
-grid on;
-ylabel('qdot_4 (degrees/s)');
-xlabel('t (sec)');
-axis 'auto x';
-
 %% PLOT END EFFECTOR 
 figure(3);
 
 subplot(2,2,1);
 plot(t, x_path, 'b', 'lineWidth', 2);
 grid on;
-xlim([0.1 1.9]);
 ylabel('x (mm)');
 xlabel('t (sec)');
 subplot(2,2,2);
 plot(t, z_path, 'b', 'lineWidth', 2);
 grid on;
-xlim([0.1 1.9]);
 ylabel('z (mm)');
 xlabel('t (sec)');
 subplot(2,2,3);
 plot(t, Vx, 'r', 'lineWidth', 2);
 grid on;
-xlim([0.1 1.9]);
 ylabel('Vx (mm/s)');
 xlabel('t (sec)');
 subplot(2,2,4);
 plot(t, Vz, 'r', 'lineWidth', 2);
 grid on;
-xlim([0.1 1.9]);
 ylabel('Vz (mm/s)');
 xlabel('t (sec)');
 axis 'auto x';
@@ -300,29 +260,25 @@ figure(2);
 t = [0 : dt : T];
 subplot(2,2,1);
 plot(t, q(:,1)*180/pi, 'b', 'lineWidth', 2);
-xlim([0.1 1.9]);
 grid on;
-ylabel('q_3 (degrees)');
+ylabel('q_2 (degrees)');
 xlabel('t (sec)');
 subplot(2,2,2);
 plot(t, q(:,2)*180/pi, 'b', 'lineWidth', 2);
-xlim([0.1 1.9]);
 grid on;
-ylabel('q_4 (degrees)');
+ylabel('q_3 (degrees)');
 xlabel('t (sec)');
 
 % Plotting angular velocities of the joints
 subplot(2,2,3);
 plot(t, q_dot(:,1)*180/pi, 'r', 'lineWidth', 2);
-xlim([0.1 1.9]);
 grid on;
-ylabel('qdot_3 (degrees/s)');
+ylabel('qdot_2 (degrees/s)');
 xlabel('t (sec)');
 subplot(2,2,4);
 plot(t, q_dot(:,2)*180/pi, 'r', 'lineWidth', 2);
-xlim([0.1 1.9]);
 grid on;
-ylabel('qdot_4 (degrees/s)');
+ylabel('qdot_3 (degrees/s)');
 xlabel('t (sec)');
 axis 'auto x';
 
@@ -332,13 +288,11 @@ figure(3);
 subplot(2,2,1);
 plot(t, x_path, 'b', 'lineWidth', 2);
 grid on;
-xlim([0.1 1.9]);
 ylabel('x (mm)');
 xlabel('t (sec)');
 subplot(2,2,2);
 plot(t, z_path, 'b', 'lineWidth', 2);
 grid on;
-xlim([0.1 1.9]);
 ylabel('z (mm)');
 xlabel('t (sec)');
 subplot(2,2,3);
@@ -350,24 +304,6 @@ xlabel('t (sec)');
 subplot(2,2,4);
 plot(t, Vz, 'r', 'lineWidth', 2);
 grid on;
-xlim([0.1 1.9]);
 ylabel('Vz (mm/s)');
 xlabel('t (sec)');
-axis 'auto x';
-
-%% PLOT KINEMATICS 
-
-figure(4);
-subplot(2,2,1);
-plot(x_path, z_path, 'b', 'lineWidth', 2);
-grid on;
-ylabel('z (mm)');
-xlabel('x (mm)');
-
-subplot(2,2,3);
-plot(Vx, Vz, 'r', 'lineWidth', 2);
-grid on;
-ylabel('Vz (mm/s)');
-xlabel('Vx (mm/s)');
-
 axis 'auto x';
