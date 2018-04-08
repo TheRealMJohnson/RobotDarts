@@ -149,7 +149,7 @@ clc;
 	T = 0.5; % Simulation duration in seconds
 
 	% Initial joint angles [q3, q4]
-	q(1,:) = [ 60*pi/180 + pi/2, 60*pi/180];
+	q(1,:) = [ 60*pi/180 + pi/2, -10*pi/180];
 	q_2 = 40*pi/180;
 
 	x3_s = l(1) .* sin(q_2);
@@ -174,24 +174,24 @@ clc;
 	x_path(1) = l(1).*sin(q_2) + l(2).*s1 + l(3).*s12; % End-effector initial position	
 	xRelease = x; % End-effector final position
 	x_dot = 0; % End-effector initial speed
-	xRelease_dot = v(1) .* cos(q3); % End-effector final speed
+	xRelease_dot = v(1) .* cos(theta); % End-effector final speed
 	
 	x_0 = x(1);
 	x_1 = x_dot;
-	x_2 = 3 .* (xRelease - x_path(1)) ./ T^2 - 2 .* (xRelease_dot - x_dot) ./ T;
-	x_3 = -2 .* (xRelease - x_path(1)) ./ T^3 + (xRelease_dot - x_dot) ./ T^2;
+	x_2 = 3 .* (xRelease - x_path(1)) ./ T^2 - 2 .* (xRelease_dot + 2*x_dot) ./ T;
+	x_3 = -2 .* (xRelease - x_path(1)) ./ T^3 + (xRelease_dot + x_dot) ./ T^2;
 
 %%------------------------------ PATH PLANNING - Z ------------------------------%%
 
 	z_path(1) = l(1).*cos(q_2) + l(2).*c1 + l(3).*c12; % End-effector initial position	
 	zRelease = z; % End-effector final position
 	z_dot = 0; % End-effector initial speed
-	zRelease_dot = v .* sin(q3); % End-effector final speed
+	zRelease_dot = v .* sin(theta); % End-effector final speed
 	
 	z_0 = z(1);
 	z_1 = z_dot;
-	z_2 = 3 * (zRelease - z_path(1)) / T^2 - 2 * (zRelease_dot - z_dot) / T;
-	z_3 = -2 * (zRelease - z_path(1)) / T^3 + (zRelease_dot - z_dot) / T^2;
+	z_2 = 3 * (zRelease - z_path(1)) / T^2 - 2 * (zRelease_dot + 2*z_dot) / T;
+	z_3 = -2 * (zRelease - z_path(1)) / T^3 + (zRelease_dot + z_dot) / T^2;
 
 %%-------------------------- SIMULATION - END EFFECTOR --------------------------%%
 
@@ -230,6 +230,8 @@ clc;
 	    
 	    k = k + 1;   
 	end
+	text(x_path(1), z_path(1),'Path','Color','Green','FontSize',14);
+	hold on;
 	plot(x_path, z_path, 'b', 'lineWidth', 2);
 
 
