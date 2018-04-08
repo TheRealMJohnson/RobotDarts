@@ -3,7 +3,7 @@ clear all;
 close all;
 clc;
 
-%%-----------------ORIENT ROBOT TO CONVERT INTO 2D PROBLEM------------------%%
+%% ORIENT ROBOT TO CONVERT INTO 2D PROBLEM
 
 % Location of the target and the robot base
 targetPos = [0.740 ; 0 ; 0.500];
@@ -19,7 +19,7 @@ l = [ 0.260, 0.290, 0.078 ];
 q1 = atan((targetPos(1) - robotPos(1)) / (targetPos(2) - robotPos(2)));
 q5 = pi / 2;
 
-%% DRAW THE WORKSPACE OF THE END EFFECTOR %%
+%% DRAW THE WORKSPACE OF THE END EFFECTOR
 
 set(0,'DefaultFigureWindowStyle','docked')
 figure(1);
@@ -44,7 +44,7 @@ ylim([-0.800 0.800]);
 hold on;
 plot(X(WS),Z(WS),'b', 'LineWidth',2);
 
-%% DRAW THE 'RELEASE LOCATION' WORKSPACE OF THE END EFFECTOR %%
+%% DRAW THE 'RELEASE LOCATION' WORKSPACE OF THE END EFFECTOR
 
 % Discretize the 'release-location' workspace with 'n' points
 n = 1;
@@ -75,7 +75,7 @@ hold on;
 plot(x(ws),z(ws),'r', 'LineWidth',1);
 hold on;
 
-%% CALCULATE PROJECTILE TRAJECTORY AND FIND RELEASE VELOCITY FOR BALL %%
+%% CALCULATE PROJECTILE TRAJECTORY AND FIND RELEASE VELOCITY FOR BALL
 
 % Target position at the point of release
 targetD = sqrt(targetPos(1)^2 + targetPos(2)^2); % Floor distance from the target to joint 3
@@ -97,7 +97,7 @@ c = targetH - z;
 % Tangential and angular velocity of end effector
 v = sqrt(b ./ (a - c));
 
-%% SIMULATE BALL  %%
+%% SIMULATE BALL
 
 j = 50;
 h = 1; % h should be consistent with the size of theta
@@ -138,7 +138,7 @@ text(x+0.1, z-0.1,'E','Color','blue','FontSize',14);
 text(targetPos(1), targetPos(3),'Target','Color','red','FontSize',14);
 hold on;
 
-%% DEFINE INITIAL JOINT POSITION %%
+%% DEFINE INITIAL JOINT POSITION
 
 
 
@@ -161,7 +161,7 @@ s12 = sin(q_2 + q(1,1) + q(1,2));
 c1 = cos(q_2 + q(1,1));
 c12 = cos(q_2 + q(1,1) + q(1,2));
 
-%%------------------------------- PATH PLANNING - X -------------------------------%%
+%% PATH PLANNING - X
 x_path = zeros(1,T/dt);
 z_path = zeros(1,T/dt);
 Vx = zeros(1,T/dt);
@@ -177,7 +177,7 @@ x_1 = x_dot;
 x_2 = (3.*(xRelease - x_path(1))./T^2) - ((xRelease_dot+2*x_dot)./T);
 x_3 = (-2.*(xRelease - x_path(1))./T^3) + ((xRelease_dot + x_dot)./T^2);
 
-%%------------------------------ PATH PLANNING - Z ------------------------------%%
+%% PATH PLANNING - Z
 
 z_path(1) = l(1).*cos(q_2) + l(2).*c1 + l(3).*c12; % End-effector initial position
 zRelease = z; % End-effector final position
@@ -189,7 +189,7 @@ z_1 = z_dot;
 z_2 = 3 * (zRelease - z_path(1)) / T^2 - (zRelease_dot + 2*z_dot) / T;
 z_3 = -2 * (zRelease - z_path(1)) / T^3 + (zRelease_dot + z_dot) / T^2;
 
-%%-------------------------- SIMULATION - END EFFECTOR --------------------------%%
+%% SIMULATION - END EFFECTOR
 
 
 k = 1;
@@ -234,7 +234,7 @@ plot(x_path, z_path, '--k', 'lineWidth', 2);
 %	Vx(k) = 0;
 %	Vz(k) = 0;
 
-%%--------------------------------- PLOT ANGLES ---------------------------------%%
+%% PLOT ANGLES
 % Plotting reference joint angles
 figure(2);
 subplot(2,2,1);
@@ -265,7 +265,7 @@ ylabel('qdot_4 (degrees/s)');
 xlabel('t (sec)');
 axis 'auto x';
 
-%%------------------------------ PLOT END EFFECTOR ------------------------------%%
+%% PLOT END EFFECTOR 
 figure(3);
 
 subplot(2,2,1);
@@ -294,27 +294,7 @@ ylabel('Vz (mm/s)');
 xlabel('t (sec)');
 axis 'auto x';
 
-%%------------------------------ PLOT KINEMATICS ------------------------------%%
-
-figure(4);
-
-subplot(2,2,1);
-plot(x_path, z_path, 'b', 'lineWidth', 2);
-grid on;
-xlim([-800 800]);
-ylabel('z (mm)');
-xlabel('x (mm)');
-
-subplot(2,2,3);
-plot(Vx, Vz, 'r', 'lineWidth', 2);
-grid on;
-xlim([-100 100]);
-ylabel('Vz (mm/s)');
-xlabel('Vx (mm/s)');
-
-axis 'auto x';
-
-%%--------------------------------- PLOT ANGLES ---------------------------------%%
+%% PLOT ANGLES
 % Plotting reference joint angles
 figure(2);
 t = [0 : dt : T];
@@ -346,7 +326,7 @@ ylabel('qdot_4 (degrees/s)');
 xlabel('t (sec)');
 axis 'auto x';
 
-%%------------------------------ PLOT END EFFECTOR ------------------------------%%
+%% PLOT END EFFECTOR
 figure(3);
 
 subplot(2,2,1);
@@ -375,7 +355,7 @@ ylabel('Vz (mm/s)');
 xlabel('t (sec)');
 axis 'auto x';
 
-%%------------------------------ PLOT KINEMATICS ------------------------------%%
+%% PLOT KINEMATICS 
 
 figure(4);
 subplot(2,2,1);
