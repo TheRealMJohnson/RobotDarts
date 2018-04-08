@@ -1,8 +1,8 @@
 %% ME547 - Project
-clear;
-clear all;
-close all;
-clc;
+clear
+clear all
+close all
+clc
 
 %%-----------------ORIENT ROBOT TO CONVERT INTO 2D PROBLEM------------------%%
 
@@ -79,13 +79,10 @@ clc;
 
 %%---------- CALCULATE PROJECTILE TRAJECTORY AND FIND RELEASE VELOCITY FOR BALL ----------%%
  	
- 	L36 = sqrt((z3 - z).^2 + (x - x3).^2); % Distance from joint 3 to the end effector
- 	
  	% Target position at the point of release
  	targetD = sqrt(targetPos(1)^2 + targetPos(2)^2); % Floor distance from the target to joint 3
  	targetH = targetPos(3); % Height of target
  	
- 	% Ball release angle, THETA, is calculated as tangent to the motion of L36
  	% This value is currently assumed and assumes q4_dot is zero at release...which is not the case.
  	THETA = [random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180), 
         random('uniform', atan((targetPos(3)-z)./(targetPos(1)-x)), pi*90/180), 
@@ -130,15 +127,15 @@ clc;
  	end	
  	
  	title("Workspace");
- 	xlabel("X Position (mm)");
- 	ylabel("Z Position (mm)");
+ 	xlabel("X Position (m)");
+ 	ylabel("Z Position (m)");
  	
  	% Plot joint headings
  	text(0, -0.100,'1','Color','blue','FontSize',14);
  	text(0, 0,'2','Color','blue','FontSize',14);
- 	text(x3-10, z3+10,'3','Color','blue','FontSize',14);
- 	text(x4, z4,'4','Color','blue','FontSize',14);
- 	text(x, z,'E','Color','blue','FontSize',14);
+ 	text(x3-0.1, z3+0.1,'3','Color','blue','FontSize',14);
+ 	text(x4-0.1, z4+0.1,'4','Color','blue','FontSize',14);
+ 	text(x+0.1, z-0.1,'E','Color','blue','FontSize',14);
  	text(targetPos(1), targetPos(3),'Target','Color','red','FontSize',14);
  	hold on;
 
@@ -146,7 +143,7 @@ clc;
 
 	% Sampling period
 	dt = 0.001; % Interval duration in seconds
-	T = 0.5; % Simulation duration in seconds
+	T = 3; % Simulation duration in seconds
 
 	% Initial joint angles [q3, q4]
 	q(1,:) = [ 60*pi/180 + pi/2, -10*pi/180];
@@ -176,7 +173,7 @@ clc;
 	x_dot = 0; % End-effector initial speed
 	xRelease_dot = v(1) .* cos(theta); % End-effector final speed
 	
-	x_0 = x(1);
+	x_0 = x_path(1);
 	x_1 = x_dot;
 	x_2 = 3 .* (xRelease - x_path(1)) ./ T^2 - 2 .* (xRelease_dot + 2*x_dot) ./ T;
 	x_3 = -2 .* (xRelease - x_path(1)) ./ T^3 + (xRelease_dot + x_dot) ./ T^2;
@@ -188,7 +185,7 @@ clc;
 	z_dot = 0; % End-effector initial speed
 	zRelease_dot = v .* sin(theta); % End-effector final speed
 	
-	z_0 = z(1);
+	z_0 = z_path(1);
 	z_1 = z_dot;
 	z_2 = 3 * (zRelease - z_path(1)) / T^2 - 2 * (zRelease_dot + 2*z_dot) / T;
 	z_3 = -2 * (zRelease - z_path(1)) / T^3 + (zRelease_dot + z_dot) / T^2;
